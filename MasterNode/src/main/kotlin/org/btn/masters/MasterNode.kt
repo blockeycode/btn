@@ -19,6 +19,7 @@ abstract class MasterNode: NodeInstance(){
         block.clerk.vote(signedData,publicKey)
     }
 
+    @ExperimentalStdlibApi
     fun compete(block: Block){
         val hash = block.hashCode
         var round = 0
@@ -26,7 +27,7 @@ abstract class MasterNode: NodeInstance(){
             val bytes = combineByteArray(hash, round)
             val signedData = sign(privateKey, bytes)
             val signedHash = hash(signedData)
-            val zeros = tailZeroCount(signedHash)
+            val zeros = leadingZeroCount(signedHash)
 
             if(btnNetwork.clerkIsReady)
                 break
@@ -42,6 +43,7 @@ abstract class MasterNode: NodeInstance(){
     }
 
 
+    @ExperimentalStdlibApi
     fun onFinalBlockReceived(block: Block){
         if(blockChain.save(block))
             compete(block)

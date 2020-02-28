@@ -16,7 +16,6 @@ import javax.crypto.spec.SecretKeySpec
 const val RSA_ALG = "RSA/ECB/PKCS1Padding"
 const val AES_ALG = "AES/ECB/PKCS5padding" //notice must be set for different vm
 private const val RSA_KF = "RSA"
-private const val SHA_KEY = "SHA-1"
 private const val KEYSIZE = 2048
 
 
@@ -102,83 +101,3 @@ fun rsaKeyPair(): KeyPair? {
     return keyPair
 }
 
-fun tailZeroCount(hash: ByteArray): Int {
-    val bigInt = BigInteger(hash)
-    println(bigInt.toString(2))
-    val count = bigInt.lowestSetBit
-    return count
-}
-
-
-private val bound = 10000000
-fun randomInt():Int{
-    return Random().nextInt(bound)%bound + bound
-}
-
-
-fun hash(data:ByteArray):ByteArray{
-    val md = MessageDigest.getInstance(SHA_KEY)
-    val hash = md.digest(data)
-    return hash
-}
-
-@ExperimentalUnsignedTypes
-@ExperimentalStdlibApi
-fun leadingZeroCount(hash: ByteArray): Int {
-    var count = 0
-    val zero:Byte = 0
-    var curByte:UByte = 0xffu
-    for ((index, b) in hash.withIndex()){
-        if(b == zero)
-            count += 8
-        else{
-            curByte = b.toUByte()
-            break
-        }
-    }
-    return count + curByte.countLeadingZeroBits()
-}
-
-@ExperimentalUnsignedTypes
-@ExperimentalStdlibApi
-fun test(i:Int):Int{
-    val arr = i.toString().toByteArray()
-    val hash = hash(arr)
-    val count = leadingZeroCount(hash)
-
-    if(count > 20){
-        println(i)
-        val s = BigInteger(hash).toString(2)
-        println("leading zero count="+count)
-    }
-    return count
-}
-
-@ExperimentalStdlibApi
-@ExperimentalUnsignedTypes
-fun test1(){
-    val zero = 0x00
-    val b1:UByte = 0x10u
-    val b3:UByte = 0x03u
-    val b7:UByte = 0x07u
-    val bn:UByte = 0xffu
-
-    println(b1.countLeadingZeroBits())
-    println(b3.countLeadingZeroBits())
-    println(b7.countLeadingZeroBits())
-    println(bn.countLeadingZeroBits())
-//    for(i in -127..127){
-//        println("i="+i+" hex="+i.toString(16)+" bin="+i.toString(2))
-//    }
-}
-@ExperimentalUnsignedTypes
-@ExperimentalStdlibApi
-fun main(){
-    var totalNumber = 0
-    for(i in 1..10000000){
-        val count = test(i)
-        if(count > 20)
-            totalNumber ++
-    }
-    print("total number="+totalNumber)
-}
