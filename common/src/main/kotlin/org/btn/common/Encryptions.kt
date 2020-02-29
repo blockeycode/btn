@@ -2,12 +2,10 @@ package org.btn.common
 
 import io.netty.buffer.Unpooled
 import io.netty.util.CharsetUtil
-import java.math.BigInteger
 import java.security.*
 import java.security.spec.EncodedKeySpec
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
-import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.spec.SecretKeySpec
@@ -57,7 +55,7 @@ fun base64Enc(bytes:ByteArray?):String{
     return s
 }
 
-private fun getRsaKey(bytes:ByteArray?,isPub:Boolean): Key {
+private fun getAsymKey(bytes:ByteArray?, isPub:Boolean): Key {
     lateinit var keySpec: EncodedKeySpec
     val keyFactory = KeyFactory.getInstance(RSA_KF)
     return if(isPub){
@@ -73,18 +71,18 @@ private fun getRsaKey(bytes:ByteArray?,isPub:Boolean): Key {
 
 
 fun sign(privBytes:ByteArray?,data:ByteArray):ByteArray{
-    return rsaEncrypt(privBytes,data)
+    return asymEncrypt(privBytes,data)
 }
 
-fun rsaEncrypt(privBytes:ByteArray?,data:ByteArray, keyIsPub:Boolean = false):ByteArray{
-    val key = getRsaKey(privBytes,keyIsPub)
+fun asymEncrypt(privKey:ByteArray?, data:ByteArray, keyIsPub:Boolean = false):ByteArray{
+    val key = getAsymKey(privKey,keyIsPub)
     val cipher = Cipher.getInstance(RSA_ALG)
     cipher.init(Cipher.ENCRYPT_MODE, key)
     return cipher.doFinal(data)
 }
 
-fun rsaDecrypt(pubBytes:ByteArray?, data:ByteArray, keyIsPub:Boolean = true):ByteArray{
-    val key = getRsaKey(pubBytes,keyIsPub)
+fun asymDecrypt(pubBytes:ByteArray?, data:ByteArray, keyIsPub:Boolean = true):ByteArray{
+    val key = getAsymKey(pubBytes,keyIsPub)
     val cipher = Cipher.getInstance(RSA_ALG)
     cipher.init(Cipher.DECRYPT_MODE, key)
     val dec = cipher.doFinal(data)
