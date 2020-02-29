@@ -6,8 +6,12 @@ repositories {
     mavenCentral()
 }
 
+println("netty_version(in supervisor node)=$netty_version")
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "io.netty:netty-all:$netty_version"
+//    implementation "io.netty:netty-all:4.1.46.Final"
     compile project(':common')
 }
 
